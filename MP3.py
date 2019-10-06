@@ -2,7 +2,17 @@ import numpy as n
 import constraint as con
 import pandas as p
 
+## Import excel documents
+preqs_excel = p.read_excel('csp_course_rotations.xlsx', sheet_name = 'prereqs')
+rot_excel = p.read_excel('csp_course_rotations.xlsx', sheet_name= 'course_rotations')
+print(rot_excel.columns)
+print(preqs_excel.columns)
+# preqs = preqs_excel.to_numpy()
+# rot = rot_excel.to_numpy()
+# print(preqs)
+# print(rot)
 
+# create instance of CSP solver
 problem = con.Problem()
 
 ## Define variables
