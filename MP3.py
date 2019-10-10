@@ -1,26 +1,44 @@
-import numpy as n
 import constraint as con
 import pandas as p
 
-## Import excel documents
-preqs_excel = p.read_excel('csp_course_rotations.xlsx', sheet_name = 'prereqs')
-rot_excel = p.read_excel('csp_course_rotations.xlsx', sheet_name= 'course_rotations')
-print(rot_excel.columns)
-print(preqs_excel.columns)
-# preqs = preqs_excel.to_numpy()
-# rot = rot_excel.to_numpy()
-# print(preqs)
-# print(rot)
-
-# create instance of CSP solver
 problem = con.Problem()
 
-## Define variables
-## prerequisites - position in list has to come before the postrequisite class
-## some classes can only be in positions
-## list of classes in the range (Fall 1 = 1, Fall 2 = 2, Spring 1 = 0, etc..)
-## Year 3 Fall 2 is the max schedulelist size (14 half-semesters total - array size should be 13)
-## schedulelist will be the array that holds all of the schedule for the student
-## Must take 2 foundation courses
-## Must take all core courses
-## Must take 3 of the eight elective courses
+### Import course rotations and prereqs to DataFrames. Default columns "Course", "Type", and rotations ("1" through "6")
+df = p.read_excel('csp_course_rotations.xlsx', sheet_name="course_rotations")
+preq_df = p.read_excel('csp_course_rotations.xlsx', sheet_name="prereqs")
+
+problem.addVariables(df['Course'].tolist(), range (1,14))
+print ('variables loaded')
+
+#### Prereq Constraint
+def preq_constraint(a, b):
+    if a < b:
+        return True
+for index, row in preq_df.iterrows():
+    problem.addConstraint(preq_constraint, [row['prereq'], row['course']])
+
+#### Capstone constraint
+def capstone_constraint(x):
+    if x == 13:
+        return True
+for index, row in df.iterrows():
+    if row['Type'] == "capstone":
+        problem.addConstraint(capstone_constraint, [row['Course']])
+
+####Rotation constraint
+rotations = df.drop(columns = ['Type'])
+rotations = rotations.set_index('Course')
+#print(rotations.to_dict('index'))
+
+#### Restrict to one class per sem
+problem.addConstraint(con.AllDifferentConstraint())
+print ("constraints set")
+
+sample = problem.getSolution()
+print(sample)
+solutions = problem.getSolutions()
+length = len(solutions)
+print ('CLASS: Artifical Intelligence, Lewis University')
+print ('NAME: Scott Carrington')
+print ('\nSTART TERM = Year 1 Fall 1')
+print ('Number of Possible Degree Plans is ' + str(length)+ '\n')
