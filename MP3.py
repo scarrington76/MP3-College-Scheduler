@@ -58,7 +58,7 @@ print(sample)
 print(schedule.to_string(header=False,index=False))
 
 ### Program stalls out when attempt is made for max # of solutions
-# solutions = problem.getSolutions()
-# length = len(solutions)
-# print ('Number of Possible Degree Plans is ' + str(length)+ '\n')
+solutions = problem.getSolutions()
+length = len(solutions)
+print ('Number of Possible Degree Plans is ' + str(length)+ '\n')
 
